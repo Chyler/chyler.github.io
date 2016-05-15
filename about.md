@@ -1,20 +1,21 @@
 ---
 layout: page
-title : About
-permalink: /about/
+title : 关于
+permalink: /关于/
 ---
 
 <h2>闪电</h2>
-<p>做一个优雅的程序员<br>但行好事 莫问前程</p>
+<p>做一个优雅的程序员</p>
 <br>
-<center><p ><strong><span class="manual">Get up and running with</span> Gravity</strong></p></center>
+<center><p ><strong><span class="manual">但行好事 莫问前程</p></center>
 <br>
 <div class="manual-post">
   <div class="manual manual-title">
-  <strong>Posting</strong>
+  <strong>教育经历</strong>
   </div>
 <p>  <div class="manual-content">
-
+      - <span class="manual">北京邮电大学</span> 工程硕士 | 2014.09 - 至今<br>
+      - <span class="manual">重庆邮电大学</span> 学士学位 | 2019.09 - 2014.06<br>
       - Create a .markdown file inside <code class="highlighter-rouge">_posts</code> folder.<br>
       - Name the file according to the format YY-MM-DD-[short name for your post].<br>  <code>2016-03-30-i-love-design.markdown</code><br>
       - Write the <a href="jekyll">Front Matter</a> and content in the file.<br>
