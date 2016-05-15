@@ -7,7 +7,7 @@ permalink: /关于/
 <h2>闪电</h2>
 <p>做一个优雅的程序员</p>
 <br>
-<center><p ><strong><span class="manual">但行好事 莫问前程</p></center>
+<center><p><strong><span class="manual">但行好事 莫问前程</strong></p></center>
 <br>
 <div class="manual-post">
   <div class="manual manual-title">
