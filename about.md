@@ -1,6 +1,6 @@
 ---
 layout: page
-title : 关于
+title : 关于闪电
 permalink: /about/
 ---
 
