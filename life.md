@@ -1,6 +1,7 @@
 ---
-layout:page
-title :生活
-permalink:/life/
-tagline:"life"
+layout: page
+title : 生活
+permalink: /life/
+category: "life"
+tagline: "life"
 ---
