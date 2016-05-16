@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: archive
 title : 架构
 permalink: /architect/
 category: "architect"

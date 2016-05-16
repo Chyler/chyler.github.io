@@ -1,0 +1,296 @@
+---
+layout: post
+title:  "Hadoop工作流引擎Oozie的安装"
+date:   2016-05-16 00:00:01
+categories: ["architect"]
+author: "Chyler"
+---
+
+
+Oozie是一种Java Web应用程序，它运行在Java servlet容器——即Tomcat——中，并使用数据库来存储以下内容：
+
+*1. 工作流定义*
+
+*2. 当前运行的工作流实例，包括实例的状态和变量*
+
+Oozie工作流是放置在控制依赖DAG（有向无环图 Direct Acyclic Graph）中的一组动作（例如，Hadoop的Map/Reduce作业、Pig作业等），其中指定了动作执行的顺序。我们会使用hPDL（一种XML流程定义语言）来描述这个图。
+
+**安装tomcat**
+
+下载tomcat二进制包  http://tomcat.apache.org/
+
+解压至`/usr/local/src/apache-tomcat-7.0.69`
+
+```
+$vi /usr/local/src/apache-tomcat-7.0.69/bin/starup.sh
+//添加：
+JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+PATH=$JAVA_HOME/bin:$PATH
+CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+TOMCAT_HOME=/usr/local/src/apache-tomcat-7.0.69
+```
+
+在目录/usr/local/src/apache-tomcat-7.0.69/bin中
+
+启动tomcat：`$sudo ./startup.sh`
+
+关闭tomcat：`$sudo ./shutdown.sh`
+
+
+**安装Oozie**
+
+需要配置：
+
+**1. Java JDK 1.6+**
+**2. Maven 3.3.9**
+**3. Hadoop 2.2.0+**
+**4. Pig 0.7+**
+
+**1. 检查本机java**
+
+```
+$java --version
+```
+
+![这里写图片描述](http://img.blog.csdn.net/20160331112701699)
+
+**2. 安装apache maven 3.3.9**
+
+maven是项目管理工具，它包含了一个项目对象模型 (Project Object Model)，一组标准集合，一个项目生命周期(Project Lifecycle)，一个依赖管理系统(Dependency Management System)，和用来运行定义在生命周期阶段(phase)中插件(plugin)目标(goal)的逻辑。当你使用Maven的时候，你用一个明确定义的项目对象模型来描述你的项目，然后Maven可以应用横切的逻辑，这些逻辑来自一组共享的（或者自定义的）插件。
+
+```
+$wget http://www-eu.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+```
+
+修改环境变量
+
+```
+$mvn -version
+```
+
+![这里写图片描述](http://img.blog.csdn.net/20160414093430080)
+
+常用基本命令：
+
+```
+mvn archetype：create 创建Maven项目
+mvn compile 编译源代码
+mvn deploy 发布项目
+mvn test-compile 编译测试源代码
+mvn test 运行应用程序中的单元测试
+mvn site 生成项目相关信息的网站
+mvn clean 清除项目目录中的生成结果
+mvn package 根据项目生成的jar
+mvn install 在本地Repository中安装jar
+mvn eclipse:eclipse 生成eclipse项目文件
+mvnjetty:run 启动jetty服务
+mvntomcat:run 启动tomcat服务
+mvn clean package -Dmaven.test.skip=true:清除以前的包后重新打包，跳过测试类
+```
+
+**3. 安装PIG**
+
+下载 解压 修改环境变量
+
+```
+$pig -info
+```
+
+![这里写图片描述](http://img.blog.csdn.net/20160414093604174)
+
+**4. oozie**
+
+step1. <a href="http://oozie.apache.org/docs/4.2.0/ENG_Building.html">编译 oozie</a>
+
+> The JARs for the specified Hadoop and Pig versions must be available
+> in one of the Maven repositories defined in Oozie main 'pom.xml' file.
+> Or they must be installed in the local Maven cache.
+
+配置pom.xml
+
+> pom作为项目对象模型，通过xml表示maven项目，使用pom.xml来实现
+
+修改pom.xml中的版本号
+
+```
+//我修改的地方：
+<tomcat.version>7.0.69</tomcat.version><hadoop.version>2.6.0</hadoop.version>
+<targetJavaVersion>1.7</targetJavaVersion>
+<pig.version>0.15.0</pig.version>
+```
+
+```
+//修改Java环境变量
+$vi ~/.bashrc
+
+```
+
+编译命令：`$mvn clean package assembly:single -DskipTests`
+
+![这里写图片描述](http://img.blog.csdn.net/20160511103926597)
+
+编译好的安装包路径： /oozie-4.2.0/distro/target/oozie-4.2.0-distro.tar.gz
+
+![这里写图片描述](http://img.blog.csdn.net/20160511104004948)
+
+*编译出错时，原因大多是因为版本不对，检查报错的依赖文件，修改对应pom.xml中的版本号。*
+
+step2.编译好之后：
+
+下载ExtJs压缩包，（我的ext-2.2.zip放在 /usr/local/src/ext-2.2.zip）一定要解压缩测试一下是否是有效的ext-2.2.zip
+
+`$sudo unzip ext-2.2.zip -d ./ext-2.2`
+
+注意路径： /usr/local/src/ext-2.2.zip
+
+hadoop路径：/home/hanying/hadoop
+
+oozie.war（oozie安装包解压缩路径）路径：/usr/local/src/oozie-4.2.0/oozie.war
+
+outputwar路径：/usr/local/src/oozie-4.2.0/oozie-server/webapps/oozie.war
+
+
+```
+$sudo ./addtowar.sh -inputwar /usr/local/src/oozie-4.2.0/oozie.war -outputwar  /usr/local/src/oozie-4.2.0/oozie-server/webapps/oozie.war -hadoop 2.6.0 /home/hanying/hadoop -extjs /usr/local/src/ext-2.2.zip
+```
+
+*如果出现error：cp: 无法获取"/tmp/oozie-war-packing-13793/ext-2.2" 的文件状态(stat): 没有那个文件或目录，可能是因为ext-2.2.zip文件有问题*
+
+成功之后会在/usr/local/src/oozie-4.2.0/oozie-server/webapps目录中生成oozie.war
+
+![这里写图片描述](http://img.blog.csdn.net/20160511104123105)
+
+step3. 创建mysql数据库oozie
+
+```
+>create database oozie;
+>grant all privileges on oozie.* to oozie@'%' identified by 'oozie';
+>FLUSH PRIVILEGES;
+```
+
+step4. 修改conf/oozie-site.xml
+
+```
+<property>
+    <name>oozie.service.JPAService.create.db.schema</name>
+    <value>true</value>
+</property>
+<property>
+    <name>oozie.service.JPAService.jdbc.driver</name>
+    <value>com.mysql.jdbc.Driver</value>
+</property>
+<property>
+    <name>oozie.service.JPAService.jdbc.url</name>
+    <value>jdbc:mysql://localhost:3306/oozie?createDatabaseIfNotExist=true</value>
+</property>
+
+<property>
+    <name>oozie.service.JPAService.jdbc.username</name>
+    <value>oozie</value>
+</property>
+
+<property>
+    <name>oozie.service.JPAService.jdbc.password</name>
+    <value>oozie</value>
+</property>
+<property>
+    <name>oozie.service.HadoopAccessorService.hadoop.configurations</name>
+    <value>*=/home/hanying/hadoop</value>
+</property> 
+<!-- 下面两个配置是hue用到的-->
+<property>
+    <name>oozie.service.ProxyUserService.proxyuser.hue.hosts</name>
+    <value>hue</value>
+</property>
+
+<property>
+    <name>oozie.service.ProxyUserService.proxyuser.hue.groups</name>
+    <value>hue</value>
+</property>
+```
+
+step5. 下载mysq连接器 mysql-connector-java-5.1.6.zip
+
+将oozie默认数据库Derby改为mysql
+
+```
+$sudo -u oozie /usr/lib/oozie/bin/oozie-setup.sh -jars mysql-connector-Java-5.1.6.jar -extjs /tmp/ext-2.2.zip
+```
+
+step6. 创建libext目录，添加依赖
+
+（创建数据库脚本的时候报错，看上去像是缺少java包，发现之前少了cp依赖包到libext中，完善这一步：
+
+```
+cp $HADOOP_HOME/share/hadoop/*/*.jar libext/
+cp $HADOOP_HOME/share/hadoop/*/lib/*.jar libext/
+
+//把hadoop与tomcat冲突jar包去掉
+mv servlet-api-2.5.jar servlet-api-2.5.jar.bak
+mv jsp-api-2.1.jar jsp-api-2.1.jar.bak
+mv jasper-compiler-5.5.23.jar jasper-compiler-5.5.23.jar.bak
+mv jasper-runtime-5.5.23.jar jasper-runtime-5.5.23.jar.bak
+
+```
+
+step7. 生成oozie数据库脚本文件，初始数据库
+
+```
+$sudo ./ooziedb.sh create -sqlfile oozie.sql
+```
+
+![这里写图片描述](http://img.blog.csdn.net/20160511114443596)
+
+```
+$sudo ./oozie-setup.sh db create -run  -sqlfile /usr/local/oozie/bin/oozie.sql
+```
+
+![这里写图片描述](http://img.blog.csdn.net/20160511114456640)
+
+step8. 修改环境变量
+
+```
+$sudo vi ~/.bashrc
+//添加
+export OOZIE_HOME=/usr/local/src/oozie-4.2.0
+export PATH=$PATH:$OOZIE_HOME/bin
+```
+
+启动oozie
+
+Start Oozie as a daemon process run:`$ bin/oozied.sh start`
+
+To start Oozie as a foreground process run:`$ bin/oozied.sh run`
+
+Check the Oozie log file logs/oozie.log to ensure Oozie started properly.
+
+Using the Oozie command line tool check the status of Oozie:`$ bin/oozie admin -oozie http://localhost:11000/oozie -status`
+
+Using a browser go to the Oozie web console , Oozie status should be NORMAL .
+
+报错，查看logs/catalina.out
+
+错误1：
+![这里写图片描述](http://img.blog.csdn.net/20160511134130643)
+
+猜测原因是org.apache.catalina.mbeans.ServerLifecycleListener是tomcat6中有的，本地配置的是tomcat7，因此找不到该类。
+
+找到该配置文件的位置：/oozie-4.2.0/oozie-server/conf/server.xml
+
+注释掉`<Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" />`
+
+错误2：
+
+![这里写图片描述](http://img.blog.csdn.net/20160511142147657)
+
+原因：要mysql-connector-java-5.1.21-bin.jar复制到所有的lib中
+
+包括：
+```
+/usr/local/src/oozie-4.2.0/libext
+/usr/local/src/oozie-4.2.0/lib
+/usr/local/src/oozie-4.2.0/oozie-server/lib
+```
+
+启动成功
+访问：http://localhost:11000/oozie/
