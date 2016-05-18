@@ -75,6 +75,7 @@ echo $filetype
 ```
 
 **判断符号[]**
+
 ```
 read -p "please input (Y/N): " yn
 [ "$yn" == "Y" -o "$yn" == "y" ] && echo "OK" && exit 0
@@ -95,6 +96,7 @@ echo "$2" #第二个参数 b
 ```
 
 **变量shift**
+
 ```
 echo "$#" #7
 echo "$@" #a b c d e f g
