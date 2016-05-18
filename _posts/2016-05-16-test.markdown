@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "php-ftm"
-date:   2016-05-16 19:50:31
+date:   2016-05-16
 categories: architect
 author: "Chyler"
 ---
