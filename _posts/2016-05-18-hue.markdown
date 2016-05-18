@@ -1,0 +1,56 @@
+---
+layout: post
+title:  "Hue在ubuntu14.04安装配置"
+date:   2016-05-16
+categories: architect
+author: "Chyler"
+---
+
+安装步骤参考 
+http://gethue.com/how-to-build-hue-on-ubuntu-14-04-trusty/
+
+配置步骤参考
+http://shiyanjun.cn/archives/1002.html
+
+修改配置文件`$vi hue/desktop/conf/pseudo-distributed.ini`
+
+![这里写图片描述](http://img.blog.csdn.net/20160509205031858)
+
+启动hue服务
+
+```
+#build/env/bin/supervisor &
+```
+error：
+
+![这里写图片描述](http://img.blog.csdn.net/20160509210356375)
+
+参考 https://github.com/cloudera/hue/issues/27 修改
+
+增加用户组hue并添加用户hue
+
+```
+sudo addgroup hue
+sudo useradd hue -g hue -M
+sudo chown -R hue:hue hue/
+```
+云上的配置一直都没弄好，本地很快就配好了
+
+
+本地配置过程：
+
+```
+$sudo apt-get install git
+$git clone https://github.com/cloudera/hue.git
+$cd hue
+$sudo apt-get install ant gcc g++ libkrb5-dev libffi-dev libmysqlclient-dev libssl-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libtidy-0.99-0 libxml2-dev libxslt-dev make libldap2-dev maven python-dev python-setuptools libgmp3-dev
+$sudo make apps
+$./build/env/bin/hue runserver
+
+```
+ **visit http://127.0.0.1:8000/ !**
+本地可以访问，ip访问不了？
+
+**在本地配置好oozie之后，hue的oozie服务会自动开启**
+
+![这里写图片描述](http://img.blog.csdn.net/20160511143513634)
