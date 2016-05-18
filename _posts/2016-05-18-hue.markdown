@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Hue在ubuntu14.04安装配置"
-date:   2016-05-16
+date:   2016-05-18
 categories: architect
 author: "Chyler"
 ---
